@@ -46,14 +46,12 @@ This script serves as the primary Identity Lifecycle Engine, transforming raw us
     * if ($Wizard.SpecialAccess -ne "None")
     * Handles Exception Management. It dynamically provisions elevated privileges (e.g., ForbiddenForest_Keys) for users with specific flags in their identity record, automating what is usually a manual ticket request process.
 
-### 2. The "Detention" Security Bot (`Security-Sweep.ps1`)
-This is a **Just-In-Time (JIT)** access control simulation.
-* **The Trigger:** Monitors user attributes for "Rule Breaking" flags (simulated by specific Description tags or Group memberships).
+### 2. The "Detention" Enforcement Engine (`Assign-Detention.ps1`)
+This script demonstrates Dynamic Access Control by modifying user attributes to trigger security changes.
+* **The Trigger:** It repurposes a standard Active Directory attribute (OfficePhone) to store a custom integer value ("Detention Hours").
 * **The Action:**
-    * Detects the target user.
-    * **Revokes** current group memberships.
-    * **Moves** the user object to the `Detention` OU (a locked-down container with Deny-All GPOs).
-    * **Logs** the incident for audit.
+    * **Attribute Modification:** Instead of just "adding a user to a group," this script modifies the identity itself (the user object)
+    * **Policy Enforcement:** By adding the user to the Detention_Squad group, the script dynamically changes the user's effective permissions (likely granting access to a "Confined" room or denying access to "Recreational" resources). This simulates a "Risk Score" system used in modern cybersecurity (e.g., User Risk goes up -> Access goes down).
 
 ---
 
