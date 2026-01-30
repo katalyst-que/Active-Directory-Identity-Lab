@@ -11,25 +11,26 @@
 - [Skills Demonstrated](#%EF%B8%8F-skills-demonstrated)
 
 ## Project Overview
-This project uses the Hogwarts ecosystem as a conceptual framework to demonstrate complex enterprise Identity & Access Management (IAM) challenges. By mapping "Houses" to Departments and "Dorms" to secure resources, we model real-world scenarios where access must be strictly segmented.
 
-The core engineering challenge focuses on dynamic security postures. In this lab, the "Forbidden Forest" represents a high-risk, restricted resource. Access to this zone is not static; it is granted dynamically through a "Detention" protocol. This simulates **Just-In-Time (JIT)** access, where a user's behavior (getting detention) triggers a temporary change in security group membership, granting them necessary access to perform specific tasks before automatically revoking it upon completion.
+This project uses the Hogwarts ecosystem as a conceptual framework to demonstrate advanced enterprise **Identity & Access Management (IAM)** protocols. By mapping "Houses" to Departments and "Dorms" to secure resources, we model a hybrid security environment that combines standard Role-Based Access Control (RBAC) with dynamic Attribute-Based Access Control (ABAC).
 
-**Key Engineering Goals:**
-* **Automation:** Replace manual data entry with bulk ingestion from structured HR data files.
-* **Security:** Enforce Least Privilege using attribute-based access control (ABAC).
-* **Self-Healing:** A scripted remediation engine that automatically identifies task completion and revokes unauthorized access without human intervention.
+The core engineering challenge focuses on **Dynamic Security Postures**. In this lab, the "Forbidden Forest" represents a restricted, high-risk resource. Access to this zone is not static; it is governed by a strict **Just-In-Time (JIT)** protocol. This simulates a real-world "Break Glass" or "Penalty" scenario: a user's identity attribute (detention hours) changes, triggering an automated workflow that temporarily grants them privileged access to a restricted security group. Once the attribute is cleared, a remediation engine automatically revokes the access, returning the user to their baseline posture.
 
----
+### Key Goals
+
+* **Automated Provisioning (RBAC):** Replaced manual Active Directory entry with a bulk ingestion script (`Import-Hogwarts.ps1`) that parses structured HR data (CSV) to create users, OUs, and Security Groups.
+* **Attribute-Based Access Control (ABAC):** Implemented a "Policy Enforcement Point" script (`Assign-Detention.ps1`) that grants permissions based on user attributes (`physicalDeliveryOfficeName`) rather than static group assignments.
+* **Self-Healing Lifecycle:** Developed a remediation script (`Log-Service.ps1`) that acts as a "Garbage Collector" for permissions—monitoring user status and automatically revoking access the moment it is no longer required.
 
 ## Architecture & Logic
 
 | Component | Technology | Description |
 | :--- | :--- | :--- |
-| **Domain Controller** | Windows Server 2022 | The heart of the identity infrastructure (AD DS, DNS). |
-| **Cloud Hosting** | Microsoft Azure | Hosted in a custom Resource Group with restricted Network Security Groups. |
-| **The "Sorting Hat"** | PowerShell Script | Reads CSV data and assigns users to the correct OU and Security Groups. |
-| **"Detention" Logic** | Scheduled Task | A security script that modifies user attributes to trigger dynamic access changes. |
+| **Identity Provider** | Windows Server 2022 | The authoritative source for identity (AD DS) and name resolution (DNS). |
+| **Cloud Infrastructure** | Microsoft Azure | Hosted in a custom Resource Group with strict Network Security Groups (NSG) to simulate an air-gapped lab. |
+| **The "Sorting Hat"** | `Import-Hogwarts.ps1` | **(RBAC)** An onboarding engine that reads CSV data and maps users to organizational units and primary security groups based on "House" traits. |
+| **The "Headmaster"** | `Assign-Detention.ps1` | **(ABAC)** A policy enforcement script that modifies identity attributes (adding "Hours") and triggers JIT group membership. |
+| **The "Groundskeeper"** | `Log-Service.ps1` | **(Remediation)** A maintenance script that decrements attribute values and removes users from restricted groups upon task completion. |
 
 ---
 
