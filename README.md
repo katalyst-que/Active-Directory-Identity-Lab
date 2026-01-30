@@ -28,7 +28,7 @@ The core engineering challenge focuses on **Dynamic Security Postures**. In this
 | :--- | :--- | :--- |
 | **Identity Provider** | Windows Server 2022 | The authoritative source for identity (AD DS) and name resolution (DNS). |
 | **Cloud Infrastructure** | Microsoft Azure | Hosted in a custom Resource Group with strict Network Security Groups (NSG) to simulate an air-gapped lab. |
-| **The "Sorting Hat"** | `Import-Hogwarts.ps1` | **(RBAC)** An onboarding engine that reads CSV data and maps users to organizational units and primary security groups based on "House" traits. |
+| **The "Sorting Hat"** | `Onboarding-Provisioning.ps1` | **(RBAC)** An onboarding engine that reads CSV data and maps users to organizational units and primary security groups based on "House" traits. |
 | **The "Headmaster"** | `Assign-Detention.ps1` | **(ABAC)** A policy enforcement script that modifies identity attributes (adding "Hours") and triggers JIT group membership. |
 | **The "Groundskeeper"** | `Log-Service.ps1` | **(Remediation)** A maintenance script that decrements attribute values and removes users from restricted groups upon task completion. |
 
