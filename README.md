@@ -68,6 +68,7 @@ We execute the `Assign-Detention.ps1` script. The output highlights the **Attrib
 
 ### 3. JIT Access Grant (Group Membership)
 A check of the user object confirms the immediate security posture change. Draco has been dynamically added to `CN=Detention_Squad`, which inherits the necessary Read/Write ACLs for the restricted folder.
+![Group Grant](./images/33_access_proof.png)
 ![Access Grant](./images/3_access_proof.png)
 
 ### 4. Remediation Cycle (The "Log-Service")
