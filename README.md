@@ -55,31 +55,29 @@ This script handles the "Return to Standard" phase of the lifecycle, proving tha
 
 ## Implementation & Verification
 
-The following workflow demonstrates the effective execution of the JIT access policies.
+The following workflow demonstrates the execution of the Just-In-Time (JIT) access policies using Draco Malfoy as the test subject.
 
 ### 1. Baseline Access Verification
-Before any policy enforcement, we verify that the user (Draco Malfoy) has standard access rights but explicitly **no access** to the restricted "Forbidden Forest" resource.
-![Baseline Access](./images/screenshot1.png)
+We verify the user's starting state. The screenshot confirms Draco is a member of his House (`Slytherin_CommonRoom`) but is **not** a member of the restricted `Detention_Squad`.
+![Baseline Access](./images/1_baseline.png)
 
 ### 2. Policy Enforcement (The "Detention" Trigger)
-We execute the `Assign-Detention.ps1` script. This modifies Draco's identity attributes, assigning him 5 hours of detention.
-![Hours Assigned](./images/screenshot2.png)
+We execute the `Assign-Detention.ps1` script. The output highlights the **Attribute-Based Access Control (ABAC)** logic in action: the script updates the "Office" attribute and immediately flags the user for "GRANTED" access to the Forbidden Forest.
+![Policy Enforcement](./images/2_trigger.png)
 
-### 3. Verification of Group State
-We confirm that multiple users have been processed. Draco now has a total of 10 hours (cumulative), while Ron, Hermione, and Harry have 5 hours each. The script handles these distinct integers dynamically.
-![Group Verification](./images/screenshot3.png)
+### 3. JIT Access Grant (Group Membership)
+A check of the user object confirms the immediate security posture change. Draco has been dynamically added to `CN=Detention_Squad`, which inherits the necessary Read/Write ACLs for the restricted folder.
+![Access Grant](./images/3_access_proof.png)
 
-### 4. JIT Access Grant
-As a result of the status change, Draco is automatically added to the *Detention_Squad*. Validating his Effective Access now shows he has **Read/Write access** to the Forbidden Forest to perform his required tasks.
-![Access Granted](./images/screenshot4.png)
+### 4. Remediation Cycle (The "Log-Service")
+We execute `Log-Service.ps1` to simulate the user performing their required tasks. The screenshot demonstrates the **Self-Healing logic**:
+* **First Run:** The system detects 10 total hours, logs 5, and calculates a remaining balance (Status: `[PARTIAL]`).
+* **Second Run:** Once the balance hits zero, the script clears the record.
+![Remediation](./images/4_remediation.png)
 
-### 5. Automated Remediation
-We execute `Log-Service.ps1` to simulate the completion of tasks. The script detects that the required hours have been served and clears the "OfficePhone" attribute.
-![Log Service](./images/screenshot5.png)
-
-### 6. Access Revocation
-Immediately upon clearing the hours, the system removes Draco from the *Detention_Squad*. A final check confirms that his access to the Forbidden Forest has been **automatically revoked**, returning him to his baseline security posture.
-![Access Revoked](./images/screenshot6.png)
+### 5. Automated Revocation
+A final audit of the user object confirms the loop is closed. The system has automatically removed Draco from the `Detention_Squad`, returning him strictly to his baseline permissions without manual admin intervention.
+![Revocation](./images/5_clean_state.png)
 
 ---
 
