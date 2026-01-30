@@ -1,75 +1,50 @@
-<#
-.SYNOPSIS
-    Decrements a user's detention balance and restores access if compliant.
-.DESCRIPTION
-    This script automates the remediation phase of the Identity Lifecycle.
-    It reduces the integer value in the 'OfficePhone' attribute.
-    Logic: If the balance reaches 0, the user is automatically removed from 
-    the 'Detention_Squad' security group (Automated Deprovisioning of Restrictions).
-.PARAMETER StudentName
-    The SamAccountName of the user.
-.PARAMETER HoursServed
-    Integer value of hours to deduct from the record.
-#>
+# SCRIPT: Log-Service.ps1
+
 param(
-    [Parameter(Mandatory=$true, Position=0)]
+    [Parameter(Mandatory=$true)]
     [string]$StudentName,
 
-    [Parameter(Mandatory=$true, Position=1)]
+    [Parameter(Mandatory=$true)]
     [int]$HoursServed
 )
 
-# Configuration
-$DetentionGroup = "Detention_Squad"
-$AttributeField = "OfficePhone" 
+Write-Host "Processing log for: [$StudentName]..." -NoNewline
+
 
 try {
-    # 1. Get Current Identity State
-    $Student = Get-ADUser -Filter "SamAccountName -eq '$StudentName'" -Properties $AttributeField -ErrorAction Stop
-    
-    # 2. Parse Current Balance
-    [int]$CurrentHours = 0
-    if ($Student.$AttributeField -match '^\d+$') { 
-        $CurrentHours = [int]$Student.$AttributeField 
-    }
-
-    if ($CurrentHours -eq 0) {
-        Write-Warning "User '$StudentName' has no active detention record."
-        break
-    }
-
-    # 3. Calculate Remediation
-    $Remaining = $CurrentHours - $HoursServed
-    $ActionTaken = ""
-
-    # 4. Conditional Access Logic (The "Freedom" Check)
-    if ($Remaining -le 0) {
-        # Condition Met: Remediation Complete
-        Set-ADUser -Identity $Student -Clear $AttributeField -ErrorAction Stop
-        
-        # REVOKE RESTRICTION (Automated Security Ops)
-        Remove-ADGroupMember -Identity $DetentionGroup -Members $Student -Confirm:$false -ErrorAction SilentlyContinue
-        
-        $Remaining = 0
-        $ActionTaken = "ACCESS RESTORED (Removed from $DetentionGroup)"
-        Write-Host "[COMPLIANT] $StudentName has cleared all detention hours." -ForegroundColor Green
-    }
-    else {
-        # Condition Met: Partial Remediation
-        Set-ADUser -Identity $Student -Replace @{$AttributeField="$Remaining"} -ErrorAction Stop
-        $ActionTaken = "Balance Updated"
-        Write-Host "[PARTIAL] $StudentName remaining balance: $Remaining hours." -ForegroundColor Yellow
-    }
-
-    # 5. Log Output
-    [PSCustomObject]@{
-        Timestamp     = Get-Date -Format "yyyy-MM-dd HH:mm"
-        User          = $Student.Name
-        HoursServed   = $HoursServed
-        NewBalance    = $Remaining
-        SystemAction  = $ActionTaken
-    }
+    $Student = Get-ADUser -Filter "SamAccountName -eq '$StudentName'" -Properties Office -ErrorAction Stop
 }
 catch {
-    Write-Error "System Error: $_"
+    Write-Warning " Student not found!"
+    break
+}
+
+[int]$CurrentHours = 0
+if ($Student.Office -match '^\d+$') { 
+    $CurrentHours = [int]$Student.Office 
+}
+
+if ($CurrentHours -eq 0) {
+    Write-Host " Has no hours recorded." -ForegroundColor Cyan
+    break
+}
+
+$Remaining = $CurrentHours - $HoursServed
+
+if ($Remaining -le 0) {
+    # Detention is Over!
+    Set-ADUser -Identity $Student -Clear "Office"
+    
+    # REVOKE ACCESS 
+    Remove-ADGroupMember -Identity "Detention_Squad" -Members $Student -Confirm:$false -ErrorAction SilentlyContinue
+    
+    Write-Host " [FREEDOM]" -ForegroundColor Green
+    Write-Host "   -> Hours cleared."
+    Write-Host "   -> Removed from Detention_Squad."
+}
+else {
+    # Detention Continues
+    Set-ADUser -Identity $Student -Clear "physicalDeliveryOfficeName"
+    Write-Host " [PARTIAL]" -ForegroundColor Yellow
+    Write-Host "   -> Remaining: $Remaining hours"
 }
