@@ -3,6 +3,13 @@
 
 ![Status](https://img.shields.io/badge/Status-Complete-success) ![Platform](https://img.shields.io/badge/Platform-Windows_Server_2022-blue) ![Tools](https://img.shields.io/badge/Tools-PowerShell_Active_Directory-blue)
 
+## Table of Contents
+- [Project Overview](#project-overview)
+- [Architecture & Logic](#architecture--logic)
+- [The Scripts (Automated Workflows)](#-the-scripts-automated-workflows)
+- [Implementation & Verification](#implementation--verification)
+- [Skills Demonstrated](#%EF%B8%8F-skills-demonstrated)
+
 ## Project Overview
 This project uses the Hogwarts ecosystem as a conceptual framework to demonstrate complex enterprise Identity & Access Management (IAM) challenges. By mapping "Houses" to Departments and "Dorms" to secure resources, we model real-world scenarios where access must be strictly segmented.
 
